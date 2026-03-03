@@ -1,1 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>バンビ診断テスト⚽️</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #ffeef5;
+      text-align: center;
+      padding: 20px;
+    }
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 20px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      background: #ff7aa2;
+      color: white;
+      font-size: 16px;
+    }
+  </style>
+</head>
 
+<body>
+
+<div class="box">
+  <h1>🦌バンビ診断テスト⚽️</h1>
+  <p id="question">スタートを押してね！</p>
+  <div id="choices"></div>
+  <button onclick="start()">スタート</button>
+</div>
+
+<script>
+let current = 0;
+let score = 0;
+
+const questions = [
+  {q:"好きな人ができたら？", a:["すぐ行く","様子見る","気づいたら好き"]},
+  {q:"LINE頻度は？", a:["めっちゃ送る","普通","気分"]},
+  {q:"駆け引きする？", a:["する","しない","無意識"]},
+  {q:"嫉妬は？", a:["めっちゃする","ちょっと","しない"]},
+  {q:"告白は？", a:["自分から","待つ","流れ"]},
+  {q:"好きなタイプは？", a:["強い人","優しい人","面白い人"]},
+  {q:"恋愛の優先度は？", a:["高い","普通","低い"]},
+  {q:"依存する？", a:["する","しない","相手次第"]},
+  {q:"浮気されたら？", a:["即切る","話す","許す"]},
+  {q:"デートは？", a:["毎週","たまに","気分"]},
+  {q:"愛情表現は？", a:["多い","普通","少ない"]},
+  {q:"喧嘩したら？", a:["すぐ謝る","話し合う","放置"]},
+  {q:"束縛は？", a:["する","しない","少し"]},
+  {q:"恋愛で大事なのは？", a:["情熱","安定","楽しさ"]},
+  {q:"最後に一言", a:["愛が全て","平和が大事","自由最高"]}
+];
+
+function start(){
+  current = 0;
+  score = 0;
+  showQuestion();
+}
+
+function showQuestion(){
+  document.querySelector("button").style.display="none";
+  let q = questions[current];
+  document.getElementById("question").innerText = q.q;
+
+  let choicesHTML = "";
+  q.a.forEach((choice,i)=>{
+    choicesHTML += `<button onclick="answer(${i})">${choice}</button>`;
+  });
+  document.getElementById("choices").innerHTML = choicesHTML;
+}
+
+function answer(i){
+  score += i;
+  current++;
+  if(current < questions.length){
+    showQuestion();
+  } else {
+    result();
+  }
+}
+
+function result(){
+  let type = "";
+  let team = "";
+  let desc = "";
+
+  if(score < 10){
+    type = "ハリー・ケインタイプ";
+    team = "バイエルン・ミュンヘン";
+    desc = "とにかく一途で愛重め！ゴール量産型の恋愛モンスター💥";
+  } else if(score < 20){
+    type = "モドリッチタイプ";
+    team = "レアル・マドリード";
+    desc = "恋の司令塔タイプ！落ち着いてて安定感ある✨";
+  } else {
+    type = "ネイマールタイプ";
+    team = "アル・ヒラル";
+    desc = "自由奔放で恋もエンタメ！気分屋天才型🎭";
+  }
+
+  document.getElementById("question").innerHTML =
+    `🎉あなたは…<br><h2>${type}</h2>
+     🏟所属チーム：${team}<br><br>
+     💘タイプ解説：${desc}`;
+
+  document.getElementById("choices").innerHTML = "";
+}
+</script>
+
+</body>
+</html>
