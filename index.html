@@ -1,66 +1,96 @@
-  <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>サッカー恋愛タイプ診断</title>
+<title>恋の戦術診断スタジアム</title>
 
 <style>
 
 body{
 font-family:sans-serif;
-background:linear-gradient(#0f2027,#203a43,#2c5364);
-color:white;
 text-align:center;
-padding:20px;
+margin:0;
+background:#6fdc6f;
 }
 
-.container{
-max-width:800px;
-margin:auto;
+/* サッカーコート */
+
+body:before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:
+radial-gradient(circle,transparent 90px,white 92px,white 94px,transparent 96px),
+linear-gradient(white 2px,transparent 2px),
+linear-gradient(90deg,white 2px,transparent 2px);
+opacity:0.25;
+z-index:-1;
 }
 
 h1{
-font-size:40px;
-margin-bottom:30px;
+font-size:38px;
+margin-top:30px;
 }
 
 .question{
-font-size:24px;
-margin-bottom:40px;
+margin:60px auto;
+width:80%;
+max-width:700px;
 }
+
+.qtext{
+font-size:24px;
+margin-bottom:30px;
+}
+
+/* MBTI丸 */
 
 .scale{
 display:flex;
-justify-content:space-between;
-margin:30px 0;
+justify-content:center;
+align-items:center;
+gap:12px;
 }
 
 .circle{
-width:45px;
-height:45px;
 border-radius:50%;
-background:white;
-opacity:0.4;
+border:3px solid black;
 cursor:pointer;
 }
 
-.circle:hover{
-opacity:1;
-transform:scale(1.2);
+.c1{width:44px;height:44px;}
+.c2{width:34px;height:34px;}
+.c3{width:22px;height:22px;}
+.c4{width:34px;height:34px;}
+.c5{width:44px;height:44px;}
+
+.selected{
+background:black;
 }
 
-.result{
-font-size:22px;
-line-height:1.6;
+.labels{
+display:flex;
+justify-content:space-between;
+margin-top:12px;
+font-size:14px;
 }
 
 button{
-padding:15px 30px;
+margin:40px;
+padding:16px 36px;
 font-size:20px;
-border:none;
-border-radius:10px;
-background:#00ff88;
 cursor:pointer;
+}
+
+#result{
+display:none;
+padding:40px;
+font-size:20px;
+max-width:700px;
+margin:auto;
 }
 
 </style>
@@ -68,107 +98,169 @@ cursor:pointer;
 
 <body>
 
-<div class="container">
+<h1>
+⚽恋の戦術診断スタジアム⚽<br>
+〜あなたの恋愛ポジションはどこ!?〜
+</h1>
 
-<h1>⚽サッカー恋愛タイプ診断⚽</h1>
+<div id="questions"></div>
 
-<div id="start">
-<button onclick="startTest()">診断スタート</button>
-</div>
+<button onclick="showResult()">結果を見る</button>
 
-<div id="quiz" style="display:none">
-<div class="question" id="question"></div>
-
-<div class="scale">
-<div class="circle" onclick="answer(1)"></div>
-<div class="circle" onclick="answer(2)"></div>
-<div class="circle" onclick="answer(3)"></div>
-<div class="circle" onclick="answer(4)"></div>
-<div class="circle" onclick="answer(5)"></div>
-<div class="circle" onclick="answer(6)"></div>
-<div class="circle" onclick="answer(7)"></div>
-<div class="circle" onclick="answer(8)"></div>
-<div class="circle" onclick="answer(9)"></div>
-</div>
-
-</div>
-
-<div id="result" class="result"></div>
-
-</div>
+<div id="result"></div>
 
 <script>
 
-let questions=[
-"好きな人ができたら自分から行く",
-"恋愛は勢いが大事",
-"駆け引きするより直感",
-"好きな人には積極的",
-"恋愛で負けたくない",
-"相手の気持ちをよく考える",
-"自分の魅力をアピールするのが得意",
-"恋愛は慎重に進める",
-"好きになると止まらない",
-"恋愛では冷静な方"
+/* 質問（あと26問追加できる） */
+
+const questions=[
+
+{
+text:"好きな人がほかの異性と話してたらどのくらい嫉妬する？",
+left:"めっちゃする",
+right:"あんまりしない"
+},
+
+{
+text:"好きになったらどのくらい突っ走る？",
+left:"止まらない",
+right:"慎重"
+},
+
+{
+text:"好きな人にどのくらいアピールする？",
+left:"ガンガンする",
+right:"様子を見る"
+},
+
+{
+text:"恋愛では主導権握りたい？",
+left:"握りたい",
+right:"任せたい"
+}
+
 ]
 
-let score=0
-let current=0
+/* 質問生成 */
 
-function startTest(){
-document.getElementById("start").style.display="none"
-document.getElementById("quiz").style.display="block"
-showQuestion()
+const container=document.getElementById("questions")
+
+questions.forEach((q,i)=>{
+
+let div=document.createElement("div")
+div.className="question"
+
+div.innerHTML=`
+<div class="qtext">${i+1}. ${q.text}</div>
+
+<div class="scale" data-q="${i}">
+<div class="circle c1" data-v="1"></div>
+<div class="circle c2" data-v="2"></div>
+<div class="circle c3" data-v="3"></div>
+<div class="circle c4" data-v="4"></div>
+<div class="circle c5" data-v="5"></div>
+</div>
+
+<div class="labels">
+<span>← ${q.left}</span>
+<span>${q.right} →</span>
+</div>
+`
+
+container.appendChild(div)
+
+})
+
+document.querySelectorAll(".circle").forEach(c=>{
+
+c.onclick=()=>{
+
+let parent=c.parentElement
+
+parent.querySelectorAll(".circle").forEach(x=>x.classList.remove("selected"))
+
+c.classList.add("selected")
+
+parent.dataset.value=c.dataset.v
+
 }
 
-function showQuestion(){
-document.getElementById("question").innerText=questions[current]
-}
+})
 
-function answer(num){
+/* 結果20タイプ */
 
-score+=num
-current++
+const types=[
 
-if(current<questions.length){
-showQuestion()
-}else{
-showResult()
-}
+`【ゴール量産機!! センターフォワードの“ハリー・ケインタイプ】
+好きになったら止まらない。重さで相手をねじ伏せる恋愛!!ただし、あまりにも器用すぎて相手に怖がられることもあるので要注意⚠️‼️`,
 
-}
+`【爆速カウンター!! ストライカーキリアン・ムバッ ペタイプ】
+●一瞬で距離詰めるけど冷めるのも早い。相手のいいところを見つけるのが上手🙌🏻ただしワンパターンすぎる恋愛に飽きられないように要注意⚠️‼️`,
+
+`【理不尽ゴラッソ FW“リオネル・メッシタイプ】
+●自然にモテてるのに本人無自覚系。寄ってくる男女を無意識のうちに弄ぶようにスルーしてるモテ人間！！`,
+
+`【フィジカルゴリ押し!! FW“アーリング・ハーラン ドタイプ】
+●勢いと圧で恋愛成立させる。ライバルも勢いと圧でねじ伏せ、誰にも負けない恋愛マスター🔥`,
+
+`【恋の司令塔‼️ボランチ“ルカ・モドリッチ”タイプ】
+●自分の恋愛にも友だちの恋愛にも的確な指示でゴールイン!!ライバルはうまくあしらって圧倒的点差で大勝利❤️‍🔥`,
+
+`【フィールド上の魔法使い‼️MF“ジャマル・ムシアラ”タイプ】
+●誰もが振り向く魔法のような魅惑と可愛さで相手を恋に落とす天性のドリブラータイプ‼️相手を虜にさせすぎるけど自分の恋愛にはちょっと不器用…`,
+
+`【大人なドリブラー‼️MF“マイケル・オリーセ”タイプ】
+●最近になってようやく魅力が人類に伝わった、'人生のモテ期はこれから'のタイプ!!あまりにもメロすぎる行動が多いので、リアコを作りすぎて自分が困らないように要注意⚠️‼️`,
+
+`【猪突猛進‼️FW “トーマス・ミュラー”タイプ】
+●超超攻めの、好きな人に猛アピールさるフォワードタイプ!!感情を表に出しやすく、一緒にいて楽しいと思われがち💝恋愛は円滑に進みやすいけど、押しすぎて相手に引かれないように注意⚠️`,
+
+`【ベルリンの壁!! GKマヌエル・ノイアータイプ】
+●自分のガードは硬いが相手へのアタックは一流💯ハーフラインまで前のめりになる恋愛が得意なタイプ‼️ただし一切の隙がない様に見えて、たまに正面がフリー‼️危ない異性には気をつけて⚠️`,
+
+`【超超天然‼️MF “久保建英”タイプ】
+●生まれつきのド天然さで異性を端から端まで落としていくタイプ‼️天然に見せかけて恋愛では視野が広く、的を射た発言が多く多くの人を沼に落とす天然👍🏻`,
+
+`【冷静沈着✨️GK'ヤン・ゾマー'タイプ】
+●恋愛は冷静に判断して守りを徹するゴールキーパータイプ‼️好きな人と一対一になっても焦らない冷静さと、嫉妬心を露わにしない カンプ・ノウスタジアム並に大きい心の持ち主👀✨️頑張りすぎて疲れないように注意⚠️‼️`,
+
+`【爆速‼️DF “アルフォンソ・デイビス”タイプ】
+●超高速で段階を踏む、駆け上がりサイドバックタイプ‼️好きな人に対しては迷わず、後悔しないようにと爆速で距離を縮められる。速すぎて相手を置いて行かないように注意‼️`,
+
+`【絶対止める‼️ DFフィルジル・ファン・ダイ クタイプ】
+●理想高すぎて誰も突破できない、高嶺の花タイプ‼️理想を下げるのではなく、相手に寄り添ってあなたが落ち着ける人を身近から探すことが大事かも✨️`,
+
+`【鉄壁ディフェンス!! DF セルヒオ・ラモス”タイ プ】
+●愛が重すぎてちょい怖い。好きな人が異性といると嫉妬で大爆発💥ストーカーにならないように要注意⚠️⚠️`,
+
+`【煽り厳禁‼️DF “アントニオ・リュディガー”タイプ】
+●フィジカルで押す、一切相手に隙を見せないタイプ‼️狙った人は逃さない辛抱強さとメンタルの強さを持つ恋愛強者❤️‍🔥ただし挑発しすぎて好きな人から距離を置かれないように要注意⚠️`,
+
+`【オフサイド常習犯‼️“ロメル・ルカク”タイプ】
+●タイミング全部ズレてる恋愛!!ただしズレてるからといって落ち込みすぎないで❗️直感で動きすぎないように要注意⚠️‼️`,
+
+`【視野がシマウマ‼️FW /MF“ルイス・ディアス”タイプ】
+●視野の広さが半端なく、周りに気を使える万能攻めタイプ‼️全てにおいてステータスが高いが、好きな人との一対一の状況になるとテンパってしまい、選択を間違えることも…`,
+
+`【魅せ方が上手い‼️FW “ラミン・ヤマル”タイプ】
+●自分のいいところをよく理解し、相手に上手にアピールするタイプ‼️恋愛の強者だけど、恋愛に生活を持っていかれてやるべきことに取り組まなくならないように要注意⚠️異性で遊びすぎるのは周りからの印象ダウンにも💧`,
+
+`【うまれたときから厨二病‼️FW “ズラタン・イブラヒモビッチ”タイプ】
+●異性の扱いをよくわかっている、唯一無二タイプ‼️誰にも真似できないような大胆な恋愛をこなす玄人🕺🏻💃🏻ただし周りからは『キープが上手い人』と思われてしまうことも…厨二病すぎる発言には要注意⚠️‼️`,
+
+`【VAR判定中‼️タイプ】
+👉好きかどうか自分でも分かってない😶アディショナルタイムはたくさんあるから、まずは相手との距離を考えてみて❕️`
+
+]
 
 function showResult(){
 
-document.getElementById("quiz").style.display="none"
+let random=Math.floor(Math.random()*types.length)
 
-let text=""
+document.getElementById("result").style.display="block"
 
-if(score>70){
-text=`【ゴール量産機!! センターフォワードの“ハリー・ケインタイプ】
-
-好きになったら止まらない。重さで相手をねじ伏せる恋愛!!ただし、あまりにも器用すぎて相手に怖がられることもあるので要注意⚠️‼️`
-}
-
-else if(score>60){
-text=`【爆速カウンター!! ストライカーキリアン・ムバッペタイプ】
-
-●一瞬で距離詰めるけど冷めるのも早い。相手のいいところを見つけるのが上手🙌🏻ただしワンパターンすぎる恋愛に飽きられないように要注意⚠️‼️`
-}
-
-else if(score>50){
-text=`【理不尽ゴラッソ FW“リオネル・メッシタイプ】
-
-●自然にモテてるのに本人無自覚系。寄ってくる男女を無意識のうちに弄ぶようにスルーしてるモテ人間！！`
-}
-
-else{
-text=`【VAR判定中‼️タイプ】
-
-👉好きかどうか自分でも分かってない😶アディショナルタイムはたくさんあるから、まずは相手との距離を考えてみて❕️`
-}
-
-document.getElementById("result").innerText=text
+document.getElementById("result").innerHTML=
+"<h2>あなたの恋愛タイプは…</h2><br>"+types[random]
 
 }
 
